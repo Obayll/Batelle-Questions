@@ -36,7 +36,7 @@ void main(int argc, char** argv)
 	// Generate the cuboid output we can pass to printf to print cuboid.
 	generate_cuboid(cuboid, x, y, z);
 
-	printf("%s\n", cuboid);
+	printf("\n%s", cuboid);
 
 	free(cuboid);
 
