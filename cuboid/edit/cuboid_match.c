@@ -32,8 +32,15 @@ void main(int argc, char** argv)
 	printf("Cuboid width: %i\n", y);
 	printf("Cuboid height: %i\n", z);
 
+	// spaces + first edge + underscores + remaining edges + newline
+	int total_chars = y + 2 + (3 * x) + (2 * (y + z + 1)) + 1;
+	int total_lines = y + z + 1;
+
+	// chars per line * lines + null terminator
+	int cuboid_buffer = total_chars * total_lines + 1;
+
 	// Allocate memory to store cuboid shape characters.
-	char* cuboid = malloc(x * y * z * sizeof(int));
+	char* cuboid = malloc(cuboid_buffer * sizeof(char));
 
 	// Generate the cuboid output we can pass to printf to print cuboid.
 	generate_cuboid(cuboid, x, y, z);
