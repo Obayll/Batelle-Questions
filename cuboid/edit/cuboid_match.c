@@ -1,4 +1,5 @@
 // Program: Take in 3 inputs.
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -44,93 +45,102 @@ void main(int argc, char** argv)
 
 void generate_cuboid(char cuboid[], int x_len, int y_len, int z_len)
 {
-	int lines = y_len + z_len;
+	int lines = y_len + z_len + 1;
 	int index = 0;
-	int i, j;
+	int i, j, k, m, side_chars;
+
 	for (i = 0; i < lines; i++)
 	{
-		int k = index;
+		k = index;
 
 		// Calculate number of spaces for this line
-		int spaces = y_len - i;
-		spaces = abs(spaces);
-		while (spaces > 0)
+		for (j = abs(y_len - i); j > 0; j--)
 		{
 			cuboid[k++] = ' ';
-			spaces--;
 		}
 
 		// Insert first edge on each line
-		if ((i <= y_len) && i != 0)
+		if (i <= y_len && i)
 		{
 			cuboid[k++] = ' ';
 			cuboid[k++] = '/';
 		}
-		else if (i > y_len)
-		{
-			cuboid[k++] = '\\';
-			cuboid[k++] = ' ';
-		}
 		else
 		{
-			cuboid[k++] = ' ';
+			if (i <= y_len)
+			{
+				cuboid[k++] = ' ';
+			}
+			else
+			{
+				cuboid[k++] = '\\';
+			}
+				
 			cuboid[k++] = ' ';
 		}
 
 		// Calculate underscores
-		int m;
 		for (m = 0; m < x_len; m++)
 		{
 			cuboid[k++] = '_';
 
-			if ((i == 0))
-			{
-				cuboid[k++] = ' ';
-				cuboid[k++] = ' ';
-			}
-			if ((i <= y_len) && i != 0)
+			if (i <= y_len && i)
 			{
 				cuboid[k++] = ' ';
 				cuboid[k++] = '/';
 			}
-			else if (i > y_len)
+			else if (i <= y_len)
+			{
+				cuboid[k++] = ' ';
+				cuboid[k++] = ' ';
+			}
+			else
 			{
 				cuboid[k++] = '\\';
-				if (m != (x_len - 1))
+
+				if ( m != x_len - 1 )
+				{
 					cuboid[k++] = ' ';
+				}
 			}
 		}
 
 		// Calculate remaining edges
-		int side_chars;
-		if (i <= z_len) {
-			side_chars = i;
-		}
-		else {
+		if (i > z_len)
+		{
 			side_chars = lines - i;
 		}
-		for (m = 0; m < side_chars; m++) {
-			if ((i == 0))
-			{
-				cuboid[k++] = ' ';
-				cuboid[k++] = ' ';
-			}
-			if (i <= y_len && i != 0)
+		else
+		{
+			side_chars = i;
+		}
+
+		for (m = 0; m < side_chars; m++)
+		{
+			if (i <= y_len && i)
 			{
 				if (m < y_len && m < z_len)
 				{
 					cuboid[k++] = '\\';
-					if (m < (side_chars - 1))
+
+					if (m < side_chars - 1)
+					{
 						cuboid[k++] = '/';
-				}			
+					}
+				}
 			}
-			else if (i > y_len)
+			else if (i <= y_len)
 			{
-				if (m < y_len && m < z_len)
+				cuboid[k++] = ' ';
+				cuboid[k++] = ' ';
+			}
+			else if (m < y_len && m < z_len)
+			{
+				cuboid[k++] = '/';
+
+				if (m < side_chars - 1)
 				{
-					cuboid[k++] = '/';
-					if (m < (side_chars - 1))
-						cuboid[k++] = '\\';
+					cuboid[k++] = '\\';
 				}
 			}
 		}
