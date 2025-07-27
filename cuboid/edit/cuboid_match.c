@@ -6,6 +6,8 @@
 
 void generate_cuboid(char cuboid[], int x_len, int y_len, int z_len);
 
+int cuboid_abs(int x);
+
 void main(int argc, char** argv)
 {
 	// Check to make sure user passes three arguments:
@@ -43,6 +45,16 @@ void main(int argc, char** argv)
 	exit(0);
 }
 
+int cuboid_abs(int x)
+{
+	if (x < 0)
+	{
+		return abs(x + 1);
+	}
+
+	return abs(x);
+}
+
 void generate_cuboid(char cuboid[], int x_len, int y_len, int z_len)
 {
 	int lines = y_len + z_len + 1;
@@ -54,7 +66,7 @@ void generate_cuboid(char cuboid[], int x_len, int y_len, int z_len)
 		k = index;
 
 		// Calculate number of spaces for this line
-		for (j = abs(y_len - i); j > 0; j--)
+		for (j = cuboid_abs(y_len - i); j > 0; j--)
 		{
 			cuboid[k++] = ' ';
 		}
@@ -62,20 +74,20 @@ void generate_cuboid(char cuboid[], int x_len, int y_len, int z_len)
 		// Insert first edge on each line
 		if (i <= y_len && i)
 		{
-			cuboid[k++] = ' ';
 			cuboid[k++] = '/';
 		}
 		else
 		{
 			if (i <= y_len)
 			{
-				cuboid[k++] = ' ';
+				//cuboid[k++] = '1';
+				;
 			}
 			else
 			{
 				cuboid[k++] = '\\';
 			}
-				
+
 			cuboid[k++] = ' ';
 		}
 
@@ -149,4 +161,6 @@ void generate_cuboid(char cuboid[], int x_len, int y_len, int z_len)
 
 		index = k;	
 	}
+
+	cuboid[k] = '\0';
 }
