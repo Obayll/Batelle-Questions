@@ -38,8 +38,8 @@ function test_xyz()
 
 function run_xyz()
 {
-    local START="-1"
-    local STOP="11"
+    local START="$1"
+    local STOP="$2"
 
     local X_ARR=($(seq "$START" "$STOP"))
     local Y_ARR=($(seq "$START" "$STOP"))
@@ -65,7 +65,7 @@ function run_xyz()
 [[ -f "$CUBOID_E_PATH" ]] || { echo "File '${CUBOID_E_PATH}' not found."; exit 1; }
 [[ -f "$CUBOID_S_PATH" ]] || { echo "File '${CUBOID_S_PATH}' not found."; exit 1; }
 
-run_xyz || { echo "Test FAILED!"; exit 1; }
+run_xyz "-1" "11" || { echo "Test FAILED!"; exit 1; }
 
 echo "Test PASSED!"
 
