@@ -85,12 +85,7 @@ void generate_cuboid(char cuboid[], int x_len, int y_len, int z_len)
 		}
 		else
 		{
-			if (i <= y_len)
-			{
-				//cuboid[k++] = '1';
-				;
-			}
-			else
+			if (i > y_len)
 			{
 				cuboid[k++] = '\\';
 			}
