@@ -1,15 +1,20 @@
 <template>
   <div>
     <h1>Vulnerability Search</h1>
-    <!-- store textbox information into query variable  -->
-    <input v-model="query" type="text" placeholder="Search for vulnerabilities..."/>
 
-    <!-- call getResults() on button click  -->
+    <!-- store dropdown menu information into variable to discern between search modes -->
+    <select v-model="searchMode">
+      <option value="title">Search by Title</option>
+      <option value="description">Search by Description</option>
+    </select>
+
+    <!-- store textbox information into query variable and call getResults() on button click -->
+    <input v-model="query" type="text" placeholder="Search for vulnerabilities..."/>
     <button @click="getResults">Search</button>
 
     <!--
       if queryResults has any entries
-      loop through array (should be length 1)
+      loop through array
       if entry is reserved, print out an error and do not print out data
       print out matched index and JSON dump
       else print no items found
@@ -20,7 +25,7 @@
           <p style="color: red;">Error: Cannot access reserved vulnerability.</p>
         </div>
         <div v-else>
-          <h2>Match at index: {{ item.index }}</h2>
+          <p style="color: greenyellow;">Match at index: {{ item.index }}</p>
           <pre>{{ item.data }}</pre>
         </div>
       </div>
@@ -37,11 +42,13 @@
 import { ref } from 'vue'
 
 // Creates reactive variables for storing the query and query results
-// Make sure to store array values under array.value, not array
+// Make sure to store values under var.value, not just var
 const query = ref('')
 const queryResults = ref([])
+const searchMode = ref('title')
 
-function isReserved(notes) {
+function isReserved(notes)
+{
   // If notes is empty, or contains no elements, return false
   if (!notes || !notes.Note) return false
 
@@ -52,7 +59,8 @@ function isReserved(notes) {
   return notesArray.some(note => note.__text.includes('** RESERVED **'))
 }
 
-async function getResults() {
+async function getResults()
+{
   // Always reset queryResults to empty upon function enter
   queryResults.value = []
 
@@ -60,7 +68,8 @@ async function getResults() {
   const cleanQuery = query.value.trim().toLowerCase()
 
   // If query contains nothing return early
-  if (!cleanQuery) {
+  if (!cleanQuery)
+  {
     return
   }
 
@@ -75,8 +84,29 @@ async function getResults() {
   const responseVuln = responseJSON.Vulnerability
 
   // Takes an array of vulnerabilities and maps the data to an explicit index
-  // Then filters the data based on the underlying title to an exact match against the user-input
-  queryResults.value = responseVuln.map((vuln, index) => ({ index, data: vuln, reserved: isReserved(vuln.Notes) }))
-    .filter(({ data }) => data.Title.toLowerCase() == cleanQuery)
+  const responseClean = responseVuln.map((vuln, index) => ({ index, data: vuln, reserved: isReserved(vuln.Notes) }))
+
+  // Filter data based on dropdown menu selection
+  queryResults.value = responseClean.filter(({ data }) => {
+    if (searchMode.value == 'title')
+    {
+      // Return status of exact match of title against user-input
+      return data.Title.toLowerCase() == cleanQuery
+    }
+    else if (searchMode.value == 'description')
+    {
+      // Normalize notes as an array
+      const notes = Array.isArray(data.Notes.Note) ? data.Notes.Note : [data.Notes.Note]
+
+      // Find note index which contains the _Type key and 'Description' value
+      const description = notes.find(note => note._Type == 'Description')
+
+      // If description was found, return status of description including user-input as a substring; else return false
+      return description ? description.__text.toLowerCase().includes(cleanQuery) : false
+    }
+
+    // Return false as a fail-safe
+    return false
+  })
 }
 </script>
