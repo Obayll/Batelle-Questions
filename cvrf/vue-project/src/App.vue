@@ -9,15 +9,23 @@
 
     <!--
       if queryResults has any entries
-      print matching index and vulnurability
+      loop through array (should be length 1)
+      if entry is reserved, print out an error and do not print out data
+      print out matched index and JSON dump
       else print no items found
     -->
-    <ul v-if="queryResults.length">
-      <div v-for="(vuln, index) in queryResults">
-        <h3>Match at index: {{ index }}</h3>
-        <pre>{{ vuln }}</pre>
+    <div v-if="queryResults.length">
+      <div v-for="(item, idx) in queryResults" :key="idx">
+        <div v-if="item.reserved">
+          <p style="color: red;">Error: Cannot access reserved vulnerability.</p>
+        </div>
+        <div v-else>
+          <h2>Match at index: {{ item.index }}</h2>
+          <pre>{{ item.data }}</pre>
+        </div>
       </div>
-    </ul>
+    </div>
+
     <p v-else>No results found.</p>
   </div>
 </template>
@@ -32,6 +40,17 @@ import { ref } from 'vue'
 // Make sure to store array values under array.value, not array
 const query = ref('')
 const queryResults = ref([])
+
+function isReserved(notes) {
+  // If notes is empty, or contains no elements, return false
+  if (!notes || !notes.Note) return false
+
+  // Normalize notes as an array
+  const notesArray = Array.isArray(notes.Note) ? notes.Note : [notes.Note]
+
+  // Return true if substring '** RESERVED **' exists in __text; else false
+  return notesArray.some(note => note.__text.includes('** RESERVED **'))
+}
 
 async function getResults() {
   // Always reset queryResults to empty upon function enter
@@ -57,7 +76,7 @@ async function getResults() {
 
   // Takes an array of vulnerabilities and maps the data to an explicit index
   // Then filters the data based on the underlying title to an exact match against the user-input
-  queryResults.value = responseVuln.map((vuln, index) => ({ index, data: vuln }))
+  queryResults.value = responseVuln.map((vuln, index) => ({ index, data: vuln, reserved: isReserved(vuln.Notes) }))
     .filter(({ data }) => data.Title.toLowerCase() == cleanQuery)
 }
 </script>
